@@ -24,7 +24,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 
  else {
-        // Check if username already exists
+        
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -32,11 +32,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         if ($stmt->num_rows > 0) {
             $errors[] = "Username already taken.";
+             echo "<script>alert('Username already taken.');</script>";
+            
         } else {
-            // Hash the password
+            
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            // Insert new user
+        
             $insert_stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
             $insert_stmt->bind_param("ss", $username, $hashed_password);
 
@@ -65,7 +67,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <title>Register</title>
  </head>
  <body>
-<div class="container">
+<div class="container" style="height:825px;margin-top:0px">
    
 
    <?php
@@ -80,7 +82,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     <form method="post" action="register.php" class='form'>
          <div class='img-container'>
-        <img src="images/peace.jpeg" alt="peace">
+        <img src="images/peace.jpeg" style="width:500px" alt="peace">
 
 </div>
 <div>

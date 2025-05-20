@@ -1,5 +1,12 @@
 <?php
 session_start();
+
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 $conn = new mysqli("localhost", "root", "", "blog_management");
 
 if ($conn->connect_error) {
@@ -12,7 +19,11 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
+$page_title = "Dashboard";
+include 'header.php'; 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,21 +34,13 @@ $result = $stmt->get_result();
     <title>Dashboard</title>
 </head>
 <body>
-<div class="large-container">
-     <nav class="navigation-bar">
-            <ul class='ul-nav'>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
-                <li><a href="dashboard.php">Dashboard</a></li>
-            </ul>
-        </nav> 
+<div class="large-container" >
 
     <h2 class='h2-con'>Your Blog Posts</h2>
     <div class='button-con'>
-    <button class='create-btn'><a  href="create_post.php">+ New Post</a></button>
-    <button class='logout-btn' onclick="location.href='logout.php'">Logout</button>
-</div>
+        <button class='create-btn'><a href="create_post.php">+ New Post</a></button>
+        <button class='logout-btn' onclick="location.href='logout.php'">Logout</button>
+    </div>
     <table>
         <tr>
             <th>Title</th>
@@ -46,22 +49,35 @@ $result = $stmt->get_result();
         <?php while ($post = $result->fetch_assoc()): ?>
         <tr>
             <td><?php echo htmlspecialchars($post['title']); ?></td>
-            <td>
-                <button><a href="edit_post.php?id=<?php echo $post['id']; ?>">Edit</a></button>
-               <button><a href="delete_post.php?id=<?php echo $post['id']; ?>">Delete</a></button> 
+            <td >
+                <button><a style="padding-bottom:200px" href="edit_post.php?id=<?php echo $post['id']; ?>">Edit</a></button>
+                <button>
+                    <a style="padding-top:-100px" href="javascript:void(0);" onclick="confirmDelete(<?php echo $post['id']; ?>)">Delete</a>
+                </button> 
             </td>
         </tr>
         <?php endwhile; ?>
     </table>
-</div>
-
- <footer class='footer'>
-        <p style="padding-top:10px">&copy; <?php echo date("Y"); ?> Blog_Management. All rights reserved.</p>
-        <p><a href="privacy_policy.php">Privacy Policy</a> | <a href="terms_of_service.php">Terms of Service</a></p>
-    </footer>
-</body>
-</html>
-
-<?php
+<div style="margin-top:425px">
+  <?php
 $stmt->close();
 $conn->close();
+include 'footer.php'; 
+?>
+</div>
+</div>
+
+
+<script>
+function confirmDelete(postId) {
+    if (confirm("Are you sure you want to delete this post?")) {
+        window.location.href = "delete_post.php?id=" + postId;
+    }
+}
+</script>
+
+  
+</body>
+
+</html>
+
